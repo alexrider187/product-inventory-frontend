@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styling for dashboard theme */
+@layer base {
+  body {
+    @apply bg-dashboard-bg text-dashboard-text antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-bold text-dashboard-text;
+  }
+
+  p, span, input, textarea {
+    @apply text-dashboard-text;
+  }
+
+  input, textarea, select {
+    @apply bg-dashboard-card border border-dashboard-border rounded-lg p-2 text-dashboard-text placeholder-dashboard-muted 
+           focus:ring-2 focus:ring-dashboard-primary focus:outline-none transition-all duration-200;
+  }
+
+  button {
+    @apply font-semibold rounded-lg px-4 py-2 transition-all duration-200;
+  }
+}
