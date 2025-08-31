@@ -25,7 +25,7 @@ export default function ProductList() {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
 
-  const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://product-inventory-backend-ug5k.onrender.com";
 
   useEffect(() => {
     const fetchProducts = async () => {
