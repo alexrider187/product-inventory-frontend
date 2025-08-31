@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useAuthContext } from "../context/AuthContext"; // updated to useAuthContext
+import { useAuthContext } from "../context/AuthContext";
 import { Button } from "../components/ui/Button";
 import { Card, CardBody } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
@@ -15,16 +15,15 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
-    role: "user",
+    role: "user", // fixed role for security
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { register } = useAuthContext(); // updated
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const navigate = useNavigate();
+  const { register } = useAuthContext();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -34,12 +33,12 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const user = await register(form); // register now properly returns User
+     await register(form); // register returns User
 
-      // Redirect based on role
-      if (user.role === "admin") navigate("/dashboard");
-      else navigate("/products");
+      // Redirect user after registration
+      navigate("/products"); // all users go to products page
     } catch (err: unknown) {
+      console.error(err);
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || "Registration failed");
       } else if (err instanceof Error) {
@@ -66,9 +65,7 @@ export default function Register() {
               Sign Up
             </h2>
 
-            {error && (
-              <p className="text-dashboard-danger text-center">{error}</p>
-            )}
+            {error && <p className="text-dashboard-danger text-center">{error}</p>}
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <Input
@@ -99,17 +96,6 @@ export default function Register() {
                 required
                 className="focus:scale-105 focus:shadow-md"
               />
-
-              <select
-                name="role"
-                value={form.role}
-                onChange={handleChange}
-                className="w-full bg-dashboard-card border border-dashboard-border rounded-lg p-2 text-dashboard-text placeholder-dashboard-muted focus:ring-2 focus:ring-dashboard-primary focus:outline-none transition-all duration-200"
-                required
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
 
               <Button
                 type="submit"

@@ -1,7 +1,8 @@
+// src/pages/Login.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthContext } from "../context/AuthContext";
 import { Button } from "../components/ui/Button";
 import { Card, CardBody } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
@@ -15,13 +16,12 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login, isAuthenticated, user } = useAuth();
+  const { login, isAuthenticated, user } = useAuthContext();
 
   // Redirect authenticated users immediately
   useEffect(() => {
-    if (isAuthenticated) {
-      // Redirect based on role or default route
-      navigate(user?.role === "admin" ? "/dashboard" : "/products", { replace: true });
+    if (isAuthenticated && user) {
+      navigate(user.role === "admin" ? "/dashboard" : "/products", { replace: true });
     }
   }, [isAuthenticated, user, navigate]);
 
@@ -35,19 +35,25 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(form);
-      // After login, useEffect above will handle redirect
+      console.log("Logging in with:", form);
+      const loggedInUser = await login(form);
+      console.log("Logged in user:", loggedInUser);
+      // useEffect handles redirect after login
     } catch (err: unknown) {
-      if (axios.isAxiosError(err))
+      console.error(err);
+      if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || "Login failed");
-      else if (err instanceof Error) setError(err.message);
-      else setError("Login failed");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // While redirecting, show spinner
+  // Show spinner while redirecting
   if (isAuthenticated) {
     return (
       <div className="flex justify-center items-center h-screen bg-dashboard-bg">
@@ -66,9 +72,7 @@ export default function Login() {
       >
         <Card className="shadow-lg hover:shadow-xl transition-transform duration-300">
           <CardBody className="space-y-6">
-            <h2 className="text-3xl font-bold text-center text-dashboard-text">
-              Login
-            </h2>
+            <h2 className="text-3xl font-bold text-center text-dashboard-text">Login</h2>
 
             {error && <p className="text-dashboard-danger text-center">{error}</p>}
 
